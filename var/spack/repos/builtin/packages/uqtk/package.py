@@ -18,6 +18,9 @@ class Uqtk(CMakePackage):
     version('3.1.0', sha256='56ecd3d13bdd908d568e9560dc52cc0f66d7bdcdbe64ab2dd0147a7cf1734f97')
     version('3.0.4', sha256='0a72856438134bb571fd328d1d30ce3d0d7aead32eda9b7fb6e436a27d546d2e')
 
+    variant('pyuqtk', multi=True, values=('ON', 'OFF'), default='OFF',
+            description='Compile Python scripts and interface to C++ libraries')
+
     depends_on('expat')
     depends_on('sundials', when='@3.1.0:')
     depends_on('blas', when='@3.1.0:')
@@ -38,8 +41,11 @@ class Uqtk(CMakePackage):
         lapack_libs = spec['lapack'].libs.joined(';')
         blas_libs = spec['blas'].libs.joined(';')
 
-        return [
+        args = [
             '-DCMAKE_SUNDIALS_DIR={0}'.format(spec['sundials'].prefix),
             '-DLAPACK_LIBRARIES={0}'.format(lapack_libs),
-            '-DBLAS_LIBRARIES={0}'.format(blas_libs)
+            '-DBLAS_LIBRARIES={0}'.format(blas_libs),
+            self.define_from_variant('PyUQTk', 'pyuqtk')
         ]
+
+        return args
